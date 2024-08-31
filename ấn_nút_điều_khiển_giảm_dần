@@ -1,0 +1,39 @@
+void nhap_so(int number)
+{
+int check = 1;
+if(number > 9 ) check = 2;
+if(number > 99 ) check = 3;
+if(number > 999 ) check = 4;
+for(unsigned char i = 0;i<check;++i)
+{
+for(int j = 0; j < 8;++j)
+{
+int currentPin = GPIO_PIN_0 << j;
+HAL_GPIO_WritePin(GPIOC,currentPin,(Code7seg[number%10] &
+currentPin)>>j);
+}
+number/=10;
+
+GPIOC -> BRR = GPIO_PIN_11>>i;
+GPIOC -> ODR |= GPIO_PIN_11>>i;
+}
+}
+void timer(int *t, int *n,int delay)
+{
+++(*t);
+if(*t == delay && *n > 0)
+{
+--(*n);
+*t = 0;
+}
+}
+int main(void)
+{
+int timer = 0;
+int number =9999;
+while(1)
+{
+nhap_so(number);
+timer(&tmer,&number,1000);
+}
+}
