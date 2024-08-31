@@ -1,0 +1,38 @@
+void showScreen(char screen[],int Delay)
+{
+LCD_setCursor(0,0);
+LCD_printf(screen);
+HAL_Delay(Delay);
+}
+void delay_ms(uint16_t Delay)
+{
+for(uint16_t i = 0 ; i < Delay ;++i)
+for(uint16_t j = 0 ; j < 6000 ; ++j){}
+
+}
+int main(void)
+{
+RCC -> APB2ENR |= 0xFC | (1<<9); //Enable ports A-F and ADC1 clock
+GPIOA -> CRL = 0x44440444; //PA3 analog
+ADC1 -> CR2 = 1 ; //Power-up
+ADC1 -> SMPR2 = (7<<9); //SMP3 = 111 ( sample time IN3 = 239.5)
+delay_ms(1);
+while (1)
+{
+ADC1 -> SQR3 = 3; // Channel 3
+ADC1 -> CR2 = 1; // Convert
+int Delay = 0;
+while(((ADC1 -> SR &(1<<1)) == 0) && (Delay < 1000))
+{
+++Delay;
+}
+uint16_t value = ADC1 -> DR;
+float t = (value/4096.0)*3.3*100.0;
+if(t > 32.0)
+{
+GPIOB -> ODR ^= 0x1000; // LED0 = PIN 12 = 0x1000
+showScreen("Alert ",1000);
+}
+else showScreen("Normal", 1000);
+}
+}
