@@ -1,0 +1,45 @@
+void Color(int color,int light)
+{
+if(color == 0)
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_3,light);
+if(color == 1)
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,light);
+if(color == 2)
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,light);
+if(color == 3){
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_3,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,light);
+}
+if(color == 4){
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_3,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,light);
+}
+if(color == 5){
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,light);
+}
+else{
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_3,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,light);
+}
+}
+int main(void)
+{
+while(1)
+{
+for(int color = 0 ; color < 7 ; ++color)
+{
+for(int light = 999 ; light > 0 ; --light)
+{
+Color(color,light);
+HAL_Delay(1);
+}
+for(int light = 0 ; light < 999 ; ++light)
+{
+Color(color,light);
+HAL_Delay(1)
+
+}
+}
+}
