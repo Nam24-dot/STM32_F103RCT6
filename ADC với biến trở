@@ -1,0 +1,27 @@
+void delay_ms(uint16_t Delay)
+{
+for(uint16_t i = 0 ; i < Delay ;++i)
+for(uint16_t j = 0 ; j < 6000 ; ++j){}
+
+}
+int main(void)
+{
+RCC -> APB2ENR |= 0xFC | (1<<9); //Enable ports A-F and ADC1 clock
+GPIOA -> CRL = 0x44444404; //PA1 analog
+GPIOB -> CRH = 0x44434444; //PB12 output
+ADC1 -> CR2 = 1 ; //Power-up
+ADC1 -> SMPR2 = (7<<3); //SMP1 = 111 ( sample time IN1 = 239.5)
+delay_ms(1);
+while (1)
+{
+ADC1 -> SQR3 = 1; // Channel 1
+ADC1 -> CR2 = 1; // Convert
+int Delay = 0;
+while(((ADC1 -> SR &(1<<1)) == 0) && (Delay < 1000))//Wait for EOC on
+{
+++Delay;
+}
+uint16_t value = ADC1 -> DR;
+GPIOB -> ODR ^= 0x1000;
+delay_ms(value + 1000);
+}
