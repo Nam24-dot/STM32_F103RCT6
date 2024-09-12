@@ -1,0 +1,31 @@
+volatile int flag = 0;
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+if(GPIO_Pin == GPIO_PIN_1)
+{
+flag = 1;
+}
+if(GPIO_Pin == GPIO_PIN_2)
+{
+flag = 2;
+}
+}
+int main(void)
+{
+volatile int cnt_button = 0;
+volatile int cnt_time = 0;
+while (1)
+{
+LCD_setCursor(0, 0);
+LCD_printf("%d",cnt_time);
+++cnt_time;
+LCD_setCursor(1, 0);
+LCD_printf("%d",cnt_button);
+if(flag == 1)
+{
+++cnt_button;
+flag = 0;
+}
+HAL_Delay(1000);
+}
+}
