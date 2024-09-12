@@ -1,0 +1,9 @@
+void Write_Status_Register(uint8_t choose_sr , uint8_t *data)
+{
+uint8_t write_sr_list[3] = {0x1,0x31,0x11};
+Write_Enable();
+HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, 0);
+HAL_SPI_Transmit(&hspi1,&write_sr_list[choose_sr-1],1, 10);
+HAL_SPI_Transmit(&hspi1, data, 1, 10);
+HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, 1);
+}
