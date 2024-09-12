@@ -1,0 +1,32 @@
+volatile int time = 0;
+volatile int flag = 0;
+volatile int start = 0;
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+if(start == 1)
+++second;
+
+}
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+if(GPIO_Pin == GPIO_PIN_1)
+{
+flag = 1;
+if(start == 0)
+start = 1;
+else start = 0;
+}
+if(GPIO_Pin == GPIO_PIN_2)
+{
+time = 0;
+}
+}
+int main(void)
+{
+while (1)
+{
+LCD_setCursor(0, 0);
+LCD_printf("%02d:%02d",time/60,time%60);
+flag = 0;
+}
+}
