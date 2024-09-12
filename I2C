@@ -1,0 +1,87 @@
+/* USER CODE BEGIN PV */
+#define DS1307_ADDRESS (0xD0)
+typedef struct
+{
+uint8_t sec;
+uint8_t min;
+uint8_t hour;
+uint8_t day;
+uint8_t date;
+uint8_t month;
+uint8_t year;
+uint8_t I2C_Buffer[8];
+}DS1307_t;
+DS1307_t DS1307;
+/* USER CODE END PV */
+/* USER CODE BEGIN 0 */
+uint8_t BCD2DEC(uint8_t c)
+{
+return (c >> 4) * 10 + (c&0x0f);
+}
+uint8_t DEC2BCD(uint8_t c)
+{
+return (c/10)<<4|(c%10);
+}
+void DS1307_WriteBuffer(I2C_HandleTypeDef *hi, uint16_t DEV_ADDR, uint8_t sizebuf)
+{
+while(HAL_I2C_Master_Transmit(&hi2c1, DEV_ADDR, DS1307.I2C_Buffer, sizebuf,
+1000));
+}
+void DS1307_ReadBuffer(I2C_HandleTypeDef *hi, uint8_t DEV_ADDR, uint8_t sizebuf){
+while(HAL_I2C_Master_Receive(&hi2c1, DEV_ADDR, DS1307.I2C_Buffer, sizebuf,
+1000));
+}
+void DS1307_GetTime(void)
+{
+DS1307.I2C_Buffer[0] = 0x00;
+DS1307_WriteBuffer(&hi2c1, DS1307_ADDRESS, 1);
+DS1307_ReadBuffer(&hi2c1, DS1307_ADDRESS, 7);
+DS1307.sec = BCD2DEC(DS1307.I2C_Buffer[0]);
+DS1307.min = BCD2DEC(DS1307.I2C_Buffer[1]);
+DS1307.hour = BCD2DEC(DS1307.I2C_Buffer[2]);
+DS1307.day = BCD2DEC(DS1307.I2C_Buffer[3]);
+DS1307.date = BCD2DEC(DS1307.I2C_Buffer[4]);
+DS1307.month = BCD2DEC(DS1307.I2C_Buffer[5]);
+DS1307.year = BCD2DEC(DS1307.I2C_Buffer[6]);
+}
+void DS1307_SetTime(uint8_t sec, uint8_t min, uint8_t hour, uint8_t day, uint8_t
+date, uint8_t month, uint8_t year)
+{
+DS1307.I2C_Buffer[0] = 0x00;
+DS1307.I2C_Buffer[1] = DEC2BCD(sec);
+DS1307.I2C_Buffer[2] = DEC2BCD(min);
+DS1307.I2C_Buffer[3] = DEC2BCD(hour);
+
+DS1307.I2C_Buffer[4] = DEC2BCD(day);
+DS1307.I2C_Buffer[5] = DEC2BCD(date);
+DS1307.I2C_Buffer[6] = DEC2BCD(month);
+DS1307.I2C_Buffer[7] = DEC2BCD(year);
+DS1307_WriteBuffer(&hi2c1, DS1307_ADDRESS, 8);
+HAL_Delay(100);
+}
+void delay(){
+TIM2->PSC = 71999;
+TIM2->ARR = 999;
+TIM2->SR = 0;
+TIM2->CR1 = 1;
+while((TIM2->SR & 1) == 0);
+TIM2->CR1 = 0;
+}
+/* USER CODE END 0 */
+/* USER CODE BEGIN 2 */
+HAL_Delay(1000);
+LCD_init();
+DS1307_SetTime(59, 30, 12, 2, 3, 5, 23);
+/* USER CODE END 2 */
+while (1)
+{
+/* USER CODE END WHILE */
+/* USER CODE BEGIN 3 */
+DS1307_GetTime();
+LCD_setCursor(0, 0);
+LCD_printf("%02d:%02d:%02d", DS1307.hour,DS1307.min, DS1307.sec);
+LCD_setCursor(1, 0);
+LCD_printf("T%d,%02d-%02d-%04d", DS1307.day,DS1307.date, DS1307.month,
+2000+DS1307.year);
+HAL_Delay(1000);
+}
