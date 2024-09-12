@@ -1,0 +1,10 @@
+void Read_Unique_ID_Number()
+{
+HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, 0);
+uint8_t MF = 0x4B;
+HAL_SPI_Transmit(&hspi1, &MF, 1, 10);
+uint8_t dummy[4] = {0};
+HAL_SPI_Transmit(&hspi1, dummy, 4, 10);
+HAL_SPI_Receive(&hspi1, read_unique_id_number, 8, 10);
+HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, 1);
+}
