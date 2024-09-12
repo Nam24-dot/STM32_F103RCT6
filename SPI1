@@ -1,0 +1,10 @@
+uint8_t Read_Status_Register(uint8_t choose_sr)
+{
+uint8_t read_sr_list[3] = {0x5, 0x35, 0x15};
+HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, 0);
+HAL_SPI_Transmit(&hspi1,&read_sr_list[choose_sr-1],1, 10);
+uint8_t SR = 0;
+HAL_SPI_Receive(&hspi1, &SR, 1, 10);
+HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, 1);
+return SR;
+}
