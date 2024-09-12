@@ -1,0 +1,55 @@
+void Color(int color,int light)
+{
+if(color == 0)
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_3,light);
+if(color == 1)
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,light);
+if(color == 2)
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,light);
+if(color == 3){
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_3,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,light);
+}
+if(color == 4){
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_3,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,light);
+}
+if(color == 5){
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,light);
+}
+else{
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_3,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_1,light);
+__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,light);
+}
+}
+int main(void)
+{
+int currentLight = 100;
+int newLight = currentLight;
+while(1)
+{
+if(newLight > 255) newLight = 255;
+currentLight = newLight;
+if(( (GPIOB -> IDR) & (1<<1)) == 0)
+{
+while(( (GPIOB -> IDR) & (1<<1)) == 0);
+newLight += 5;
+for(int i = currentLight ; i < newLight; ++i)
+{
+Color(3,i);
+HAL_Delay(1);
+
+}
+}
+if(( (GPIOB -> IDR) & (1<<2)) == 0)
+{
+while(( (GPIOB -> IDR) & (1<<2)) == 0);
+newLight -= 5;
+for(int i = currentLight ; i > newLight ; --i)
+{
+Color(3,i);
+HAL_Delay(1);
+}
+}
