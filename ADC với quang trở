@@ -1,0 +1,30 @@
+void delay_ms(uint16_t Delay)
+{
+for(uint16_t i = 0 ; i < Delay ;++i)
+for(uint16_t j = 0 ; j < 6000 ; ++j){}
+
+}
+int main(void)
+{
+RCC -> APB2ENR |= 0xFC | (1<<9); //Enable ports A-F and ADC1 clock
+GPIOA -> CRL = 0x44444044; //PA2 analog
+ADC1 -> CR2 = 1 ; //Power-up
+ADC1 -> SMPR2 = (7<<6); //SMP2 = 111 ( sample time IN1 = 239.5)
+delay_ms(1);
+while (1)
+{
+ADC1 -> SQR3 = 2; // Channel 1
+ADC1 -> CR2 = 1; // Convert
+int Delay = 0;
+while(((ADC1 -> SR &(1<<1)) == 0) && (Delay < 1000))//Wait for EOC on
+{
+++Delay;
+}
+uint16_t value = ADC1 -> DR;
+float tmp = value *(3.3/4096.0);
+float ohm = (20000.0*(3.3 - tmp))/tmp;
+LCD_setCursor(0,0);
+LCD_printf("OHM = %f ",ohm);
+delay_ms(500);
+}
+}
