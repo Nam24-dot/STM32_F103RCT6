@@ -1,0 +1,35 @@
+volatile unsigned char flag = 0;
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc)
+{
+flag = 1;
+}
+void UART_print_float(UART_HandleTypeDef *huart,float f)
+{
+uint8_t send_data[16];
+int l = sprintf(send_data,"%f",f);
+for(int i = 0 ; i < l ; ++i)
+{
+if( (send_data[i] >= '0' && send_data[i] <= '9') ||
+(send_data[i] == '.') || (send_data[i] == ',') )
+{
+HAL_UART_Transmit(huart,&send_data[i],1, 100);
+HAL_Delay(1000);
+}
+}
+}
+int main(void)
+{
+HAL_ADC_Start_IT(&hadc1);
+while (1)
+{
+volatile float t = 0;
+if(flag == 1)
+{
+t = (HAL_ADC_GetValue(&hadc1)/4096)*3.3*100.0;
+UART_print_float(&huart1,t);
+HAL_Delay(3000);
+flag = 0;
+HAL_ADC_Start_IT(&hadc1);
+}
+}
+}
